@@ -164,7 +164,48 @@ export function* createCard(listId, data, index, autoOpen) {
     return;
   }
 
-  yield put(actions.createCard.success(localId, card));
+  let cardMemberships;
+  let cardLabels;
+  let taskLists;
+  let tasks;
+  let attachments;
+  let customFieldGroups;
+  let customFields;
+  let customFieldValues;
+
+  try {
+    ({
+      item: card, // eslint-disable-line no-param-reassign
+      included: {
+        cardMemberships,
+        cardLabels,
+        taskLists,
+        tasks,
+        attachments,
+        customFieldGroups,
+        customFields,
+        customFieldValues,
+      },
+    } = yield call(request, api.getCard, card.id));
+  } catch (error) {
+    yield put(actions.createCard.failure(localId, error));
+    return;
+  }
+
+  yield put(
+    actions.createCard.success(
+      localId,
+      card,
+      cardMemberships,
+      cardLabels,
+      taskLists,
+      tasks,
+      attachments,
+      customFieldGroups,
+      customFields,
+      customFieldValues,
+    ),
+  );
 
   if (watchForCreateCardActionTask && watchForCreateCardActionTask.isRunning()) {
     yield call(goToCard, card.id);
