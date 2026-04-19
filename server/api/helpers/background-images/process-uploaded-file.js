@@ -5,7 +5,6 @@
 
 const { v4: uuid } = require('uuid');
 const { rimraf } = require('rimraf');
-const { fileTypeFromFile } = require('file-type');
 const sharp = require('sharp');
 
 const { MAX_SIZE_TO_PROCESS_AS_IMAGE } = require('../../../constants');
@@ -23,6 +22,7 @@ module.exports = {
   },
 
   async fn(inputs) {
+    const { fileTypeFromFile } = await import('file-type');
     const fileManager = sails.hooks['file-manager'].getInstance();
 
     const fileType = await fileTypeFromFile(inputs.file.fd);
