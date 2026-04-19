@@ -293,11 +293,25 @@ export default class extends BaseModel {
         Card.upsert(payload.card);
 
         break;
-      case ActionTypes.CARD_CREATE__SUCCESS:
+      case ActionTypes.CARD_CREATE__SUCCESS: {
         Card.withId(payload.localId).deleteWithClearable();
-        Card.upsert(payload.card);
+
+        const cardModel = Card.upsert(payload.card);
+
+        if (payload.cardMemberships) {
+          payload.cardMemberships.forEach(({ userId }) => {
+            cardModel.users.add(userId);
+          });
+        }
+
+        if (payload.cardLabels) {
+          payload.cardLabels.forEach(({ labelId }) => {
+            cardModel.labels.add(labelId);
+          });
+        }
 
         break;
+      }
       case ActionTypes.CARD_CREATE__FAILURE:
         Card.withId(payload.localId).deleteWithClearable();
 
